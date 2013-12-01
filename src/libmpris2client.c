@@ -20,7 +20,6 @@
 
 #include "libmpris2client.h"
 #include "mpris2-metadata.h"
-//#include "mpris2-utils.h"
 
 struct _Mpris2Client
 {

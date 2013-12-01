@@ -10,6 +10,13 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AM_PROG_LIBTOOL
 
+# check for gtk-doc
+m4_ifdef([GTK_DOC_CHECK], [
+GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+],[
+AM_CONDITIONAL([ENABLE_GTK_DOC], false)
+])
+
 # Checks for libraries.
 PKG_CHECK_MODULES(GIO, gio-2.0, HAVE_GIO=yes, AC_MSG_ERROR([Could not find gio-2.0]))
 
@@ -23,9 +30,13 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
-AC_CONFIG_FILES([Makefile
-	libmpris2client.pc
-	src/Makefile])
+AC_CONFIG_FILES([
+Makefile
+libmpris2client.pc
+src/Makefile
+docs/Makefile
+docs/version.xml
+])
 AC_OUTPUT
 
 echo "

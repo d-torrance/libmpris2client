@@ -41,6 +41,8 @@ typedef enum {
 #define MPRIS2_IS_CLIENT_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), MPRIS2_TYPE_CLIENT))
 #define MPRIS2_CLIENT_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), MPRIS2_TYPE_CLIENT, Mpris2ClientClass))
 
+GType mpris2_client_get_type  (void) G_GNUC_CONST;
+
 typedef struct _Mpris2Client Mpris2Client;
 typedef struct _Mpris2ClientClass Mpris2ClientClass;
 
@@ -110,8 +112,6 @@ gboolean        mpris2_client_is_connected              (Mpris2Client *mpris2);
 const gchar    *mpris2_client_get_player                (Mpris2Client *mpris2);
 void            mpris2_client_set_player                (Mpris2Client *mpris2, const gchar *player);
 gchar          *mpris2_client_auto_set_player           (Mpris2Client *mpris2);
-
-GType           mpris2_client_get_type (void) G_GNUC_CONST;
 
 Mpris2Client   *mpris2_client_new (void);
 
