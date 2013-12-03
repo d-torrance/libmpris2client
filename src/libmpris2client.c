@@ -46,6 +46,7 @@ struct _Mpris2Client
 	GDBusProxy      *proxy;
 	gchar			*dbus_name;
 	guint            watch_id;
+	guint            playback_timer_id;
 
 	/* Conf. */
 	gchar           *player;
@@ -70,6 +71,7 @@ struct _Mpris2Client
 	PlaybackStatus   playback_status;
 	Mpris2Metadata  *metadata;
 	gdouble          volume;
+	gint             position;
 
 	/* Optionals Interface MediaPlayer2.Player */
 	gboolean         has_loop_status;
@@ -83,6 +85,7 @@ enum
 {
 	CONNECTION,
 	PLAYBACK_STATUS,
+	PLAYBACK_TICK,
 	METADATA,
 	VOLUME,
 	LOOP_STATUS,
@@ -103,6 +106,7 @@ static gchar    *mpris2_client_check_player                    (Mpris2Client *mp
 static void      mpris2_client_connect_dbus                    (Mpris2Client *mpris2);
 
 static GVariant *mpris2_client_get_all_player_properties       (Mpris2Client *mpris2);
+static GVariant *mpris2_client_get_player_properties           (Mpris2Client *mpris2, const gchar *prop);
 static void      mpris2_client_set_player_properties           (Mpris2Client *mpris2, const gchar *prop, GVariant *vprop);
 
 static GVariant *mpris2_client_get_all_media_player_properties (Mpris2Client *mpris2);
@@ -401,6 +405,21 @@ mpris2_client_is_connected (Mpris2Client *mpris2)
 }
 
 /*
+ * Position handlers.
+ */
+static gboolean
+playback_tick_emit_cb (gpointer user_data)
+{
+	Mpris2Client *mpris2 = user_data;
+
+	mpris2->position += 1000000;
+
+	g_signal_emit (mpris2, signals[PLAYBACK_TICK], 0, mpris2->position);
+
+	return TRUE;
+}
+
+/*
  * SoundmenuDbus.
  */
 
@@ -598,6 +617,40 @@ mpris2_client_get_all_media_player_properties (Mpris2Client *mpris2)
 	return child;
 }
 
+
+/* Get any player propertie using org.freedesktop.DBus.Properties interfase. */
+
+static GVariant *
+mpris2_client_get_player_properties (Mpris2Client *mpris2, const gchar *prop)
+{
+	GVariant *v, *iter;
+	GError *error = NULL;
+
+	v = g_dbus_connection_call_sync (mpris2->gconnection,
+	                                 mpris2->dbus_name,
+	                                 "/org/mpris/MediaPlayer2",
+	                                 "org.freedesktop.DBus.Properties",
+	                                 "Get",
+	                                  g_variant_new ("(ss)",
+                                                     "org.mpris.MediaPlayer2.Player",
+                                                     prop),
+	                                 G_VARIANT_TYPE ("(v)"),
+	                                 G_DBUS_CALL_FLAGS_NONE,
+	                                 -1,
+	                                 NULL,
+	                                 &error);
+	if (error) {
+		g_critical ("Could not get properties on org.mpris.MediaPlayer2, %s",
+		            error ? error->message : "no error given");
+		g_clear_error (&error);
+		return NULL;
+	}
+
+	g_variant_get (v, "(v)", &iter);
+
+	return iter;
+}
+
 /* Change any player propertie using org.freedesktop.DBus.Properties interfase. */
 
 static void
@@ -721,6 +774,8 @@ mpris2_metadata_new_from_variant (GVariant *dictionary)
 static void
 mpris2_client_parse_playback_status (Mpris2Client *mpris2, const gchar *playback_status)
 {
+	GVariant *value;
+
 	if (0 == g_ascii_strcasecmp(playback_status, "Playing")) {
 		mpris2->playback_status = PLAYING;
 	}
@@ -729,6 +784,20 @@ mpris2_client_parse_playback_status (Mpris2Client *mpris2, const gchar *playback
 	}
 	else {
 		mpris2->playback_status = STOPPED;
+	}
+
+	if (mpris2->playback_status == PLAYING) {
+		value = mpris2_client_get_player_properties (mpris2, "Position");
+		mpris2->position = (gint) g_variant_get_int64 (value);
+
+		if (mpris2->playback_timer_id == 0)
+			mpris2->playback_timer_id = g_timeout_add_seconds (1, playback_tick_emit_cb, mpris2);
+	}
+	else {
+		if (mpris2->playback_timer_id > 0) {
+			g_source_remove (mpris2->playback_timer_id);
+			mpris2->playback_timer_id = 0;
+		}
 	}
 }
 
@@ -1064,6 +1133,15 @@ mpris2_client_class_init (Mpris2ClientClass *klass)
 		              G_TYPE_FROM_CLASS (gobject_class),
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (Mpris2ClientClass, playback_status),
+		              NULL, NULL,
+	                  g_cclosure_marshal_VOID__INT,
+	                  G_TYPE_NONE, 1, G_TYPE_INT);
+
+	signals[PLAYBACK_TICK] =
+		g_signal_new ("playback-tick",
+		              G_TYPE_FROM_CLASS (gobject_class),
+		              G_SIGNAL_RUN_LAST,
+		              G_STRUCT_OFFSET (Mpris2ClientClass, playback_tick),
 		              NULL, NULL,
 	                  g_cclosure_marshal_VOID__INT,
 	                  G_TYPE_NONE, 1, G_TYPE_INT);

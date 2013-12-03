@@ -68,6 +68,7 @@ struct _Mpris2ClientClass {
 	GObjectClass parent_class;
 	void (*connection)      (Mpris2Client *mpris2, gboolean        connected);
 	void (*playback_status) (Mpris2Client *mpris2, PlaybackStatus  playback_status);
+	void (*playback_tick)   (Mpris2Client *mpris2, gint            position);
 	void (*metadata)        (Mpris2Client *mpris2, Mpris2Metadata *metadata);
 	void (*volume)          (Mpris2Client *mpris2, gdouble         volume);
 	void (*loop_status)     (Mpris2Client *mpris2, LoopStatus      loop_status);
