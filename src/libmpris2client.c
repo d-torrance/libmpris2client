@@ -43,7 +43,8 @@ struct _Mpris2Client
 
 	/* Priv */
 	GDBusConnection *gconnection;
-	GDBusProxy      *proxy;
+	GDBusProxy      *props_proxy;
+	GDBusProxy      *player_proxy;
 	gchar			*dbus_name;
 	guint            watch_id;
 	guint            playback_timer_id;
@@ -370,9 +371,13 @@ mpris2_client_set_player (Mpris2Client *mpris2, const gchar *player)
 		g_bus_unwatch_name (mpris2->watch_id);
 		mpris2->watch_id = 0;
 	}
-	if (mpris2->proxy != NULL) {
-		g_object_unref (mpris2->proxy);
-		mpris2->proxy = NULL;
+	if (mpris2->props_proxy != NULL) {
+		g_object_unref (mpris2->props_proxy);
+		mpris2->props_proxy = NULL;
+	}
+	if (mpris2->player_proxy != NULL) {
+		g_object_unref (mpris2->player_proxy);
+		mpris2->player_proxy = NULL;
 	}
 
 	/* Set new player */
@@ -926,16 +931,19 @@ mpris2_client_parse_media_player_properties (Mpris2Client *mpris2, GVariant *pro
 }
 
 static void
-mpris2_client_on_dbus_signal (GDBusProxy *proxy,
-                              gchar      *sender_name,
-                              gchar      *signal_name,
-                              GVariant   *parameters,
-                              gpointer    user_data)
+mpris2_client_on_dbus_props_signal (GDBusProxy *proxy,
+                                    gchar      *sender_name,
+                                    gchar      *signal_name,
+                                    GVariant   *parameters,
+                                    gpointer    user_data)
 {
 	GVariantIter iter;
 	GVariant *child;
 
 	Mpris2Client *mpris2 = user_data;
+
+	if (g_ascii_strcasecmp (signal_name, "PropertiesChanged"))
+		return;
 
 	g_variant_iter_init (&iter, parameters);
 
@@ -944,6 +952,31 @@ mpris2_client_on_dbus_signal (GDBusProxy *proxy,
 
 	child = g_variant_iter_next_value (&iter); /* Property name. */
 	mpris2_client_parse_player_properties (mpris2, child);
+	g_variant_unref (child);
+}
+
+static void
+mpris2_client_on_dbus_player_signal (GDBusProxy *proxy,
+                                     gchar      *sender_name,
+                                     gchar      *signal_name,
+                                     GVariant   *parameters,
+                                     gpointer    user_data)
+{
+	GVariantIter iter;
+	GVariant *child;
+
+	Mpris2Client *mpris2 = user_data;
+
+	if (g_ascii_strcasecmp (signal_name, "Seeked"))
+		return;
+
+	g_variant_iter_init (&iter, parameters);
+
+	child = g_variant_iter_next_value (&iter);
+
+	mpris2->position = g_variant_get_int64 (child);
+	g_signal_emit (mpris2, signals[PLAYBACK_TICK], 0, mpris2->position);
+
 	g_variant_unref (child);
 }
 
@@ -1041,6 +1074,7 @@ mpris2_client_connect_dbus (Mpris2Client *mpris2)
 	                                          mpris2,
 	                                          NULL);
 
+	/* interface=org.freedesktop.DBus.Properties */
 	proxy = g_dbus_proxy_new_sync (mpris2->gconnection,
 	                               G_DBUS_PROXY_FLAGS_NONE,
 	                               NULL,
@@ -1057,8 +1091,29 @@ mpris2_client_connect_dbus (Mpris2Client *mpris2)
     }
     else {
 		g_signal_connect (proxy, "g-signal",
-			              G_CALLBACK (mpris2_client_on_dbus_signal), mpris2);
-		mpris2->proxy = proxy;
+			              G_CALLBACK (mpris2_client_on_dbus_props_signal), mpris2);
+		mpris2->props_proxy = proxy;
+	}
+
+	/* interface=org.mpris.MediaPlayer2.Player */
+	proxy = g_dbus_proxy_new_sync (mpris2->gconnection,
+	                               G_DBUS_PROXY_FLAGS_NONE,
+	                               NULL,
+	                               mpris2->dbus_name,
+	                               "/org/mpris/MediaPlayer2",
+	                               "org.mpris.MediaPlayer2.Player",
+	                               NULL, /* GCancellable */
+	                               &gerror);
+
+	if (proxy == NULL) {
+		g_printerr ("Error creating proxy: %s\n", gerror->message);
+		g_error_free (gerror);
+		gerror = NULL;
+    }
+    else {
+		g_signal_connect (proxy, "g-signal",
+			              G_CALLBACK (mpris2_client_on_dbus_player_signal), mpris2);
+		mpris2->player_proxy = proxy;
 	}
 
 	mpris2->watch_id = watch_id;
@@ -1197,7 +1252,8 @@ mpris2_client_init (Mpris2Client *mpris2)
 	}
 
 	mpris2->gconnection           = gconnection;
-	mpris2->proxy                 = NULL;
+	mpris2->props_proxy           = NULL;
+	mpris2->player_proxy          = NULL;
 	mpris2->dbus_name             = NULL;
 	mpris2->watch_id              = 0;
 
