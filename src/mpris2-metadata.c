@@ -16,6 +16,17 @@
  *  Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA 02110-1335, USA.
  */
 
+/**
+* SECTION:Mpris2Metadata
+* @short_description: See the metadata page on the freedesktop.org wiki for a list of common fields.
+* @title: Mpris2Metadata
+* @section_id:
+* @stability: Unstable
+* @include: mpris2client/mpris2metadata.h
+*
+* See the metadata page on the freedesktop.org wiki for a list of common fields.
+*/
+
 #include "mpris2-metadata.h"
 
 struct _Mpris2Metadata {

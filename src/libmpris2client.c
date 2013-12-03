@@ -16,10 +16,26 @@
  *  Foundation, Inc., 51 Franklin Street, Suite 500, Boston, MA 02110-1335, USA.
  */
 
+/**
+* SECTION:libmpris2client
+* @short_description: Main interface to connect with mpris2 players
+* @title: Mpris2Client
+* @section_id:
+* @stability: Unstable
+* @include: mpris2client/mpris2client.h
+*
+* All functions used to connect with mpris2 players is located here.
+*/
+
 #include <gio/gio.h>
 
 #include "libmpris2client.h"
 #include "mpris2-metadata.h"
+
+/**
+ * Libmpri2client:
+ * It is a generic library for controlling any mpris2 compatible player
+ */
 
 struct _Mpris2Client
 {
@@ -91,6 +107,19 @@ static void      mpris2_client_set_player_properties           (Mpris2Client *mp
 
 static GVariant *mpris2_client_get_all_media_player_properties (Mpris2Client *mpris2);
 static void      mpris2_client_set_media_player_properties     (Mpris2Client *mpris2, const gchar *prop, GVariant *vprop);
+
+/**
+ * mpris2_client_new:
+ *
+ * Returns: a new instance of mpris2client.
+ */
+
+Mpris2Client *
+mpris2_client_new (void)
+{
+	return g_object_new(MPRIS2_TYPE_CLIENT, NULL);
+}
+
 /*
  *  Basic control of gdbus functions
  */
@@ -1014,8 +1043,12 @@ mpris2_client_class_init (Mpris2ClientClass *klass)
 	gobject_class = G_OBJECT_CLASS (klass);
 	gobject_class->finalize = mpris2_client_finalize;
 
-	/*
-	 * Signals:
+	/**
+	 * Mpris2Client::connection:
+	 * @client: the object which received the signal
+	 * @connection: the new connection to mpris2 interface
+	 *
+	 * The ::connection signal is emitted each time that connecction changed.
 	 */
 	signals[CONNECTION] =
 		g_signal_new ("connection",
@@ -1113,10 +1146,4 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->connected             = FALSE;
 
 	mpris2_client_connect_dbus (mpris2);
-}
-
-Mpris2Client *
-mpris2_client_new (void)
-{
-	return g_object_new(MPRIS2_TYPE_CLIENT, NULL);
 }

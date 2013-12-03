@@ -22,12 +22,30 @@
 #include <glib-object.h>
 #include "mpris2-metadata.h"
 
+/**
+ * PlaybackStatus:
+ * @PLAYING: A track is currently playing.
+ * @PAUSED: A track is currently paused.
+ * @STOPPED: There is no track currently playing.
+ *
+ * The current playback status:
+ * See mpris2 specification <ulink url="http://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html#Property:PlaybackStatus">PlaybackStatus</ulink>
+ */
 typedef enum {
 	PLAYING = 1,
 	PAUSED,
 	STOPPED
 } PlaybackStatus;
 
+/**
+ * LoopStatus:
+ * @NONE: The playback will stop when there are no more tracks to play
+ * @TRACK: The current track will start again from the begining once it has finished playing
+ * @PLAYLIST: The playback loops through a list of tracks
+ *
+ * The current loop / repeat status:
+ * See mpris2 specification <ulink url="http://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html#Property:LoopStatus">LoopStatus</ulink>
+ */
 typedef enum {
 	NONE = 1,
 	TRACK,
@@ -55,6 +73,18 @@ struct _Mpris2ClientClass {
 	void (*loop_status)     (Mpris2Client *mpris2, LoopStatus      loop_status);
 	void (*shuffle)         (Mpris2Client *mpris2, gboolean        shuffle);
 };
+
+/*
+ * Library.
+ */
+
+Mpris2Client   *mpris2_client_new (void);
+
+const gchar    *mpris2_client_get_player                (Mpris2Client *mpris2);
+void            mpris2_client_set_player                (Mpris2Client *mpris2, const gchar *player);
+gchar          *mpris2_client_auto_set_player           (Mpris2Client *mpris2);
+
+gboolean        mpris2_client_is_connected              (Mpris2Client *mpris2);
 
 /*
  * Methods
@@ -102,17 +132,5 @@ void            mpris2_client_set_loop_status           (Mpris2Client *mpris2, L
 gboolean        mpris2_client_player_has_shuffle        (Mpris2Client *mpris2);
 gboolean        mpris2_client_get_shuffle               (Mpris2Client *mpris2);
 void            mpris2_client_set_shuffle               (Mpris2Client *mpris2, gboolean shuffle);
-
-/*
- * Library.
- */
-
-gboolean        mpris2_client_is_connected              (Mpris2Client *mpris2);
-
-const gchar    *mpris2_client_get_player                (Mpris2Client *mpris2);
-void            mpris2_client_set_player                (Mpris2Client *mpris2, const gchar *player);
-gchar          *mpris2_client_auto_set_player           (Mpris2Client *mpris2);
-
-Mpris2Client   *mpris2_client_new (void);
 
 #endif
