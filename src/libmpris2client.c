@@ -70,6 +70,7 @@ struct _Mpris2Client
 
 	/* Interface MediaPlayer2.Player */
 	PlaybackStatus   playback_status;
+	gdouble          rate;
 	Mpris2Metadata  *metadata;
 	gdouble          volume;
 	gint             position;
@@ -426,7 +427,7 @@ playback_tick_emit_cb (gpointer user_data)
 {
 	Mpris2Client *mpris2 = user_data;
 
-	mpris2->position += 1000000;
+	mpris2->position += (mpris2->rate)*1000000;
 
 	g_signal_emit (mpris2, signals[PLAYBACK_TICK], 0, mpris2->position);
 
@@ -835,6 +836,9 @@ mpris2_client_parse_player_properties (Mpris2Client *mpris2, GVariant *propertie
 		if (0 == g_ascii_strcasecmp (key, "PlaybackStatus")) {
 			playback_status = g_variant_get_string(value, NULL);
 		}
+		else if (0 == g_ascii_strcasecmp (key, "Rate")) {
+			mpris2->rate = g_variant_get_double(value);
+		}
 		else if (0 == g_ascii_strcasecmp (key, "Metadata")) {
 			metadata = mpris2_metadata_new_from_variant (value);
 		}
@@ -1051,6 +1055,7 @@ mpris2_client_lose_dbus (GDBusConnection *connection,
 
 	/* Interface MediaPlayer2.Player */
 	mpris2->playback_status = STOPPED;
+	mpris2->rate            = 1.0;
 	if (mpris2->metadata != NULL) {
 		mpris2_metadata_free (mpris2->metadata);
 		mpris2->metadata = NULL;
@@ -1278,6 +1283,7 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->supported_mime_types  = NULL;
 
 	mpris2->playback_status       = STOPPED;
+	mpris2->rate                  = 1.0;
 	mpris2->metadata              = NULL;
 	mpris2->volume                = -1;
 
