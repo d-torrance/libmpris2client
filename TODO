@@ -9,9 +9,6 @@ Properties:
  * CanPause         b                    Read only
  * CanSeek          b                    Read only
  * CanControl       b                    Read only
-Methods:
- * Seek            (x: Offset)               → nothing
- * SetPosition     (o: TrackId, x: Position) → nothing
 
 [Interface org.mpris.MediaPlayer2.TrackList]
  * Everything.

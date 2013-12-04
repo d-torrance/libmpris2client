@@ -127,8 +127,126 @@ mpris2_client_new (void)
 }
 
 /*
- *  Basic control of gdbus functions
+ *  Interface MediaPlayer2.Player Methods
  */
+
+void
+mpris2_client_prev (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Previous");
+}
+
+void
+mpris2_client_next (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Next");
+}
+
+void
+mpris2_client_pause (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Pause");
+}
+
+void
+mpris2_client_play_pause (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "PlayPause");
+}
+
+void
+mpris2_client_stop (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Stop");
+}
+
+void
+mpris2_client_play (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Play");
+}
+
+void
+mpris2_client_seek (Mpris2Client *mpris2, gint offset)
+{
+	GDBusMessage *message;
+	GError       *error = NULL;
+
+	message = g_dbus_message_new_method_call (mpris2->dbus_name,
+	                                          "/org/mpris/MediaPlayer2",
+	                                          "org.mpris.MediaPlayer2.Player",
+	                                          "Seek");
+	g_dbus_message_set_body (message, g_variant_new ("(x)", offset));
+
+	g_dbus_connection_send_message (mpris2->gconnection,
+	                                message,
+	                                G_DBUS_SEND_MESSAGE_FLAGS_NONE,
+	                                NULL,
+	                                &error);
+	if (error != NULL) {
+		g_warning ("unable to send message: %s", error->message);
+		g_clear_error (&error);
+		error = NULL;
+	}
+
+	g_dbus_connection_flush_sync (mpris2->gconnection, NULL, &error);
+	if (error != NULL) {
+		g_warning ("unable to flush message queue: %s", error->message);
+		g_clear_error (&error);
+	}
+
+	g_object_unref (message);
+}
+
+void
+mpris2_client_set_position (Mpris2Client *mpris2, const gchar *track_id, gint position)
+{
+	GDBusMessage *message;
+	GError       *error = NULL;
+
+	message = g_dbus_message_new_method_call (mpris2->dbus_name,
+	                                          "/org/mpris/MediaPlayer2",
+	                                          "org.mpris.MediaPlayer2.Player",
+	                                          "SetPosition");
+	g_dbus_message_set_body (message, g_variant_new ("(ox)", track_id, position));
+
+	g_dbus_connection_send_message (mpris2->gconnection,
+	                                message,
+	                                G_DBUS_SEND_MESSAGE_FLAGS_NONE,
+	                                NULL,
+	                                &error);
+	if (error != NULL) {
+		g_warning ("unable to send message: %s", error->message);
+		g_clear_error (&error);
+		error = NULL;
+	}
+
+	g_dbus_connection_flush_sync (mpris2->gconnection, NULL, &error);
+	if (error != NULL) {
+		g_warning ("unable to flush message queue: %s", error->message);
+		g_clear_error (&error);
+	}
+
+	g_object_unref (message);
+}
 
 void
 mpris2_client_open_uri (Mpris2Client *mpris2, const gchar *uri)
@@ -162,49 +280,17 @@ mpris2_client_open_uri (Mpris2Client *mpris2, const gchar *uri)
 	g_object_unref (message);
 }
 
-void
-mpris2_client_play (Mpris2Client *mpris2)
-{
-	if (!mpris2->connected)
-		return;
-
-	mpris2_client_call_player_method (mpris2, "Play");
-}
+/*
+ *  Interface MediaPlayer2 Methods
+ */
 
 void
-mpris2_client_play_pause (Mpris2Client *mpris2)
+mpris2_client_raise_player (Mpris2Client *mpris2)
 {
-	if (!mpris2->connected)
+	if (!mpris2->can_raise)
 		return;
 
-	mpris2_client_call_player_method (mpris2, "PlayPause");
-}
-
-void
-mpris2_client_stop (Mpris2Client *mpris2)
-{
-	if (!mpris2->connected)
-		return;
-
-	mpris2_client_call_player_method (mpris2, "Stop");
-}
-
-void
-mpris2_client_prev (Mpris2Client *mpris2)
-{
-	if (!mpris2->connected)
-		return;
-
-	mpris2_client_call_player_method (mpris2, "Previous");
-}
-
-void
-mpris2_client_next (Mpris2Client *mpris2)
-{
-	if (!mpris2->connected)
-		return;
-
-	mpris2_client_call_player_method (mpris2, "Next");
+	mpris2_client_call_media_player_method (mpris2, "Raise");
 }
 
 void
@@ -223,15 +309,6 @@ mpris2_client_set_fullscreen_player (Mpris2Client *mpris2, gboolean fullscreen)
 		return;
 
 	mpris2_client_set_media_player_properties (mpris2, "Fullscreen", g_variant_new_boolean(fullscreen));
-}
-
-void
-mpris2_client_raise_player (Mpris2Client *mpris2)
-{
-	if (!mpris2->can_raise)
-		return;
-
-	mpris2_client_call_media_player_method (mpris2, "Raise");
 }
 
 /*
