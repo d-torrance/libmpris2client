@@ -162,6 +162,15 @@ mpris2_client_open_uri (Mpris2Client *mpris2, const gchar *uri)
 }
 
 void
+mpris2_client_play (Mpris2Client *mpris2)
+{
+	if (!mpris2->connected)
+		return;
+
+	mpris2_client_call_player_method (mpris2, "Play");
+}
+
+void
 mpris2_client_play_pause (Mpris2Client *mpris2)
 {
 	if (!mpris2->connected)

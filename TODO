@@ -1,0 +1,19 @@
+[Interface org.mpris.MediaPlayer2.Player]
+Properties:
+ * Rate             d   (Playback_Rate)  Read/Write
+ * MinimumRate      d   (Playback_Rate)  Read only
+ * MaximumRate      d   (Playback_Rate)  Read only
+ * CanGoNext        b                    Read only
+ * CanGoPrevious    b                    Read only
+ * CanPlay          b                    Read only
+ * CanPause         b                    Read only
+ * CanSeek          b                    Read only
+ * CanControl       b                    Read only
+Methods:
+ * Seek            (x: Offset)               → nothing
+ * SetPosition     (o: TrackId, x: Position) → nothing
+
+[Interface org.mpris.MediaPlayer2.TrackList]
+ * Everything.
+[Interface org.mpris.MediaPlayer2.Playlists]
+ * Everything.
