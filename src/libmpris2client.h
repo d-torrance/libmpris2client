@@ -139,6 +139,16 @@ gdouble         mpris2_client_get_minimum_rate          (Mpris2Client *mpris2);
 
 gdouble         mpris2_client_get_maximum_rate          (Mpris2Client *mpris2);
 
+gboolean        mpris2_client_get_can_go_next           (Mpris2Client *mpris2);
+
+gboolean        mpris2_client_get_can_go_previous       (Mpris2Client *mpris2);
+
+gboolean        mpris2_client_get_can_play              (Mpris2Client *mpris2);
+
+gboolean        mpris2_client_get_can_pause             (Mpris2Client *mpris2);
+
+gboolean        mpris2_client_get_can_seek              (Mpris2Client *mpris2);
+
 gboolean        mpris2_client_get_can_control           (Mpris2Client *mpris2);
 
 /*

@@ -76,6 +76,11 @@ struct _Mpris2Client
 	gint             position;
 	gdouble          minimum_rate;
 	gdouble          maximum_rate;
+	gboolean         can_go_next;
+	gboolean         can_go_previous;
+	gboolean         can_play;
+	gboolean         can_pause;
+	gboolean         can_seek;
 	gboolean         can_control;
 
 	/* Optionals Interface MediaPlayer2.Player */
@@ -139,6 +144,9 @@ mpris2_client_prev (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
+	if (!mpris2->can_go_previous)
+		return;
+
 	mpris2_client_call_player_method (mpris2, "Previous");
 }
 
@@ -146,6 +154,9 @@ void
 mpris2_client_next (Mpris2Client *mpris2)
 {
 	if (!mpris2->connected)
+		return;
+
+	if (!mpris2->can_go_next)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Next");
@@ -157,6 +168,9 @@ mpris2_client_pause (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
+	if (!mpris2->can_pause)
+		return;
+
 	mpris2_client_call_player_method (mpris2, "Pause");
 }
 
@@ -164,6 +178,9 @@ void
 mpris2_client_play_pause (Mpris2Client *mpris2)
 {
 	if (!mpris2->connected)
+		return;
+
+	if (!mpris2->can_pause)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "PlayPause");
@@ -185,6 +202,9 @@ void
 mpris2_client_play (Mpris2Client *mpris2)
 {
 	if (!mpris2->connected)
+		return;
+
+	if (!mpris2->can_play)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Play");
@@ -376,6 +396,36 @@ gdouble
 mpris2_client_get_maximum_rate (Mpris2Client *mpris2)
 {
 	return mpris2->maximum_rate;
+}
+
+gboolean
+mpris2_client_get_can_go_next (Mpris2Client *mpris2)
+{
+	return mpris2->can_go_next;
+}
+
+gboolean
+mpris2_client_get_can_go_previous (Mpris2Client *mpris2)
+{
+	return mpris2->can_go_previous;
+}
+
+gboolean
+mpris2_client_get_can_play (Mpris2Client *mpris2)
+{
+	return mpris2->can_play;
+}
+
+gboolean
+mpris2_client_get_can_pause (Mpris2Client *mpris2)
+{
+	return mpris2->can_pause;
+}
+
+gboolean
+mpris2_client_get_can_seek (Mpris2Client *mpris2)
+{
+	return mpris2->can_seek;
 }
 
 gboolean
@@ -977,6 +1027,21 @@ mpris2_client_parse_player_properties (Mpris2Client *mpris2, GVariant *propertie
 		else if (0 == g_ascii_strcasecmp (key, "MaximumRate")) {
 			mpris2->maximum_rate = g_variant_get_double(value);
 		}
+		else if (0 == g_ascii_strcasecmp (key, "CanGoNext")) {
+			mpris2->can_go_next = g_variant_get_boolean(value);
+		}
+		else if (0 == g_ascii_strcasecmp (key, "CanGoPrevious")) {
+			mpris2->can_go_previous = g_variant_get_boolean(value);
+		}
+		else if (0 == g_ascii_strcasecmp (key, "CanPlay")) {
+			mpris2->can_play = g_variant_get_boolean(value);
+		}
+		else if (0 == g_ascii_strcasecmp (key, "CanPause")) {
+			mpris2->can_pause = g_variant_get_boolean(value);
+		}
+		else if (0 == g_ascii_strcasecmp (key, "CanSeek")) {
+			mpris2->can_seek = g_variant_get_boolean(value);
+		}
 		else if (0 == g_ascii_strcasecmp (key, "CanControl")) {
 			mpris2->can_control = g_variant_get_boolean(value);
 		}
@@ -1200,6 +1265,11 @@ mpris2_client_lose_dbus (GDBusConnection *connection,
 	mpris2->position        = 0;
 	mpris2->minimum_rate    = 1.0;
 	mpris2->maximum_rate    = 1.0;
+	mpris2->can_go_next     = FALSE;
+	mpris2->can_go_previous = FALSE;
+	mpris2->can_play        = FALSE;
+	mpris2->can_pause       = FALSE;
+	mpris2->can_seek        = FALSE;
 	mpris2->can_control     = FALSE;
 
 	/* Optionals Interface MediaPlayer2.Player */
@@ -1429,6 +1499,11 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->position              = 0;
 	mpris2->minimum_rate          = 1.0;
 	mpris2->maximum_rate          = 1.0;
+	mpris2->can_go_next           = FALSE;
+	mpris2->can_go_previous       = FALSE;
+	mpris2->can_play              = FALSE;
+	mpris2->can_pause             = FALSE;
+	mpris2->can_seek              = FALSE;
 	mpris2->can_control           = FALSE;
 
 	mpris2->has_loop_status       = FALSE;
