@@ -76,6 +76,7 @@ struct _Mpris2Client
 	gint             position;
 	gdouble          minimum_rate;
 	gdouble          maximum_rate;
+	gboolean         can_control;
 
 	/* Optionals Interface MediaPlayer2.Player */
 	gboolean         has_loop_status;
@@ -172,6 +173,9 @@ void
 mpris2_client_stop (Mpris2Client *mpris2)
 {
 	if (!mpris2->connected)
+		return;
+
+	if (!mpris2->can_control)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Stop");
@@ -372,6 +376,12 @@ gdouble
 mpris2_client_get_maximum_rate (Mpris2Client *mpris2)
 {
 	return mpris2->maximum_rate;
+}
+
+gboolean
+mpris2_client_get_can_control (Mpris2Client *mpris2)
+{
+	return mpris2->can_control;
 }
 
 /*
@@ -967,6 +977,9 @@ mpris2_client_parse_player_properties (Mpris2Client *mpris2, GVariant *propertie
 		else if (0 == g_ascii_strcasecmp (key, "MaximumRate")) {
 			mpris2->maximum_rate = g_variant_get_double(value);
 		}
+		else if (0 == g_ascii_strcasecmp (key, "CanControl")) {
+			mpris2->can_control = g_variant_get_boolean(value);
+		}
 		/* Optionals */
 		else if (0 == g_ascii_strcasecmp (key, "LoopStatus")) {
 			loop_status_changed = TRUE;
@@ -1187,6 +1200,7 @@ mpris2_client_lose_dbus (GDBusConnection *connection,
 	mpris2->position        = 0;
 	mpris2->minimum_rate    = 1.0;
 	mpris2->maximum_rate    = 1.0;
+	mpris2->can_control     = FALSE;
 
 	/* Optionals Interface MediaPlayer2.Player */
 	mpris2->has_loop_status = FALSE;
@@ -1415,6 +1429,7 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->position              = 0;
 	mpris2->minimum_rate          = 1.0;
 	mpris2->maximum_rate          = 1.0;
+	mpris2->can_control           = FALSE;
 
 	mpris2->has_loop_status       = FALSE;
 	mpris2->loop_status           = FALSE;

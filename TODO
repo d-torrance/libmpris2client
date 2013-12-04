@@ -6,7 +6,6 @@ Properties:
  * CanPlay          b                    Read only
  * CanPause         b                    Read only
  * CanSeek          b                    Read only
- * CanControl       b                    Read only
 
 [Interface org.mpris.MediaPlayer2.TrackList]
  * Everything.

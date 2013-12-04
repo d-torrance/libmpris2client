@@ -139,6 +139,11 @@ gdouble         mpris2_client_get_minimum_rate          (Mpris2Client *mpris2);
 
 gdouble         mpris2_client_get_maximum_rate          (Mpris2Client *mpris2);
 
+gboolean        mpris2_client_get_can_control           (Mpris2Client *mpris2);
+
+/*
+ * Optionals Interface MediaPlayer2.Player properties.
+ */
 gboolean        mpris2_client_player_has_loop_status    (Mpris2Client *mpris2);
 LoopStatus      mpris2_client_get_loop_status           (Mpris2Client *mpris2);
 void            mpris2_client_set_loop_status           (Mpris2Client *mpris2, LoopStatus loop_status);
