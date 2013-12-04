@@ -49,8 +49,9 @@ struct _Mpris2Client
 	guint            watch_id;
 	guint            playback_timer_id;
 
-	/* Conf. */
+	/* Settings. */
 	gchar           *player;
+	gboolean         strict_mode;
 
 	/* Status */
 	gboolean         connected;
@@ -134,6 +135,18 @@ mpris2_client_new (void)
 	return g_object_new(MPRIS2_TYPE_CLIENT, NULL);
 }
 
+gboolean
+mpris2_client_get_strict_mode (Mpris2Client *mpris2)
+{
+	return mpris2->strict_mode;
+}
+
+void
+mpris2_client_set_strict_mode (Mpris2Client *mpris2, gboolean strict_mode)
+{
+	mpris2->strict_mode = strict_mode;
+}
+
 /*
  *  Interface MediaPlayer2.Player Methods
  */
@@ -144,7 +157,10 @@ mpris2_client_prev (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
-	if (!mpris2->can_go_previous)
+	if (!mpris2->can_control)
+		return;
+
+	if (mpris2->strict_mode && !mpris2->can_go_previous)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Previous");
@@ -156,7 +172,10 @@ mpris2_client_next (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
-	if (!mpris2->can_go_next)
+	if (!mpris2->can_control)
+		return;
+
+	if (mpris2->strict_mode && !mpris2->can_go_next)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Next");
@@ -168,7 +187,10 @@ mpris2_client_pause (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
-	if (!mpris2->can_pause)
+	if (!mpris2->can_control)
+		return;
+
+	if (mpris2->strict_mode && !mpris2->can_pause)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Pause");
@@ -180,7 +202,10 @@ mpris2_client_play_pause (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
-	if (!mpris2->can_pause)
+	if (!mpris2->can_control)
+		return;
+
+	if (mpris2->strict_mode && !mpris2->can_pause)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "PlayPause");
@@ -195,6 +220,9 @@ mpris2_client_stop (Mpris2Client *mpris2)
 	if (!mpris2->can_control)
 		return;
 
+	if (mpris2->strict_mode && !mpris2->can_control)
+		return;
+
 	mpris2_client_call_player_method (mpris2, "Stop");
 }
 
@@ -204,7 +232,10 @@ mpris2_client_play (Mpris2Client *mpris2)
 	if (!mpris2->connected)
 		return;
 
-	if (!mpris2->can_play)
+	if (!mpris2->can_control)
+		return;
+
+	if (mpris2->strict_mode && !mpris2->can_play)
 		return;
 
 	mpris2_client_call_player_method (mpris2, "Play");
@@ -1512,6 +1543,7 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->shuffle               = FALSE;
 
 	mpris2->connected             = FALSE;
+	mpris2->strict_mode           = FALSE;
 
 	mpris2_client_connect_dbus (mpris2);
 }

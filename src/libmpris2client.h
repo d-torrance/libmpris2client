@@ -87,6 +87,9 @@ gchar          *mpris2_client_auto_set_player           (Mpris2Client *mpris2);
 
 gboolean        mpris2_client_is_connected              (Mpris2Client *mpris2);
 
+gboolean        mpris2_client_get_strict_mode           (Mpris2Client *mpris2);
+void            mpris2_client_set_strict_mode           (Mpris2Client *mpris2, gboolean strict_mode);
+
 /*
  * Interface MediaPlayer2.Player Methods
  */
