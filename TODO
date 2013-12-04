@@ -1,8 +1,6 @@
 [Interface org.mpris.MediaPlayer2.Player]
 Properties:
  * Rate             d   (Playback_Rate)  Read/Write [Read Done]
- * MinimumRate      d   (Playback_Rate)  Read only
- * MaximumRate      d   (Playback_Rate)  Read only
  * CanGoNext        b                    Read only
  * CanGoPrevious    b                    Read only
  * CanPlay          b                    Read only

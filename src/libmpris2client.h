@@ -125,10 +125,19 @@ gchar         **mpris2_client_get_supported_mime_types  (Mpris2Client *mpris2);
  */
 PlaybackStatus  mpris2_client_get_playback_status       (Mpris2Client *mpris2);
 
+gdouble         mpris2_client_get_playback_rate         (Mpris2Client *mpris2);
+
 Mpris2Metadata *mpris2_client_get_metadata              (Mpris2Client *mpris2);
 
 gdouble         mpris2_client_get_volume                (Mpris2Client *mpris2);
 void            mpris2_client_set_volume                (Mpris2Client *mpris2, gdouble volume);
+
+gint            mpris2_client_get_position              (Mpris2Client *mpris2);
+gint            mpris2_client_get_accurate_position     (Mpris2Client *mpris2);
+
+gdouble         mpris2_client_get_minimum_rate          (Mpris2Client *mpris2);
+
+gdouble         mpris2_client_get_maximum_rate          (Mpris2Client *mpris2);
 
 gboolean        mpris2_client_player_has_loop_status    (Mpris2Client *mpris2);
 LoopStatus      mpris2_client_get_loop_status           (Mpris2Client *mpris2);

@@ -74,6 +74,8 @@ struct _Mpris2Client
 	Mpris2Metadata  *metadata;
 	gdouble          volume;
 	gint             position;
+	gdouble          minimum_rate;
+	gdouble          maximum_rate;
 
 	/* Optionals Interface MediaPlayer2.Player */
 	gboolean         has_loop_status;
@@ -321,6 +323,12 @@ mpris2_client_get_playback_status (Mpris2Client *mpris2)
 	return mpris2->playback_status;
 }
 
+gdouble
+mpris2_client_get_playback_rate (Mpris2Client *mpris2)
+{
+	return mpris2->rate;
+}
+
 Mpris2Metadata *
 mpris2_client_get_metadata (Mpris2Client *mpris2)
 {
@@ -338,6 +346,37 @@ mpris2_client_set_volume (Mpris2Client *mpris2, gdouble volume)
 {
 	mpris2_client_set_player_properties (mpris2, "Volume", g_variant_new_double(volume));
 }
+
+gint
+mpris2_client_get_position (Mpris2Client *mpris2)
+{
+	return mpris2->position;
+}
+
+gint
+mpris2_client_get_accurate_position (Mpris2Client *mpris2)
+{
+	GVariant *value;
+	value = mpris2_client_get_player_properties (mpris2, "Position");
+
+	return (gint) g_variant_get_int64 (value);
+}
+
+gdouble
+mpris2_client_get_minimum_rate (Mpris2Client *mpris2)
+{
+	return mpris2->minimum_rate;
+}
+
+gdouble
+mpris2_client_get_maximum_rate (Mpris2Client *mpris2)
+{
+	return mpris2->maximum_rate;
+}
+
+/*
+ * Optionals Interface MediaPlayer2.Player properties.
+ */
 
 gboolean
 mpris2_client_player_has_loop_status (Mpris2Client *mpris2)
@@ -922,6 +961,13 @@ mpris2_client_parse_player_properties (Mpris2Client *mpris2, GVariant *propertie
 		else if (0 == g_ascii_strcasecmp (key, "Volume")) {
 			volume = g_variant_get_double(value);
 		}
+		else if (0 == g_ascii_strcasecmp (key, "MinimumRate")) {
+			mpris2->minimum_rate = g_variant_get_double(value);
+		}
+		else if (0 == g_ascii_strcasecmp (key, "MaximumRate")) {
+			mpris2->maximum_rate = g_variant_get_double(value);
+		}
+		/* Optionals */
 		else if (0 == g_ascii_strcasecmp (key, "LoopStatus")) {
 			loop_status_changed = TRUE;
 			loop_status = g_variant_get_string(value, NULL);
@@ -1138,6 +1184,9 @@ mpris2_client_lose_dbus (GDBusConnection *connection,
 		mpris2->metadata = NULL;
 	}
 	mpris2->volume          = -1;
+	mpris2->position        = 0;
+	mpris2->minimum_rate    = 1.0;
+	mpris2->maximum_rate    = 1.0;
 
 	/* Optionals Interface MediaPlayer2.Player */
 	mpris2->has_loop_status = FALSE;
@@ -1280,7 +1329,7 @@ mpris2_client_class_init (Mpris2ClientClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (Mpris2ClientClass, playback_status),
 		              NULL, NULL,
-	                  g_cclosure_marshal_VOID__INT,
+	                  g_cclosure_marshal_VOID__ENUM,
 	                  G_TYPE_NONE, 1, G_TYPE_INT);
 
 	signals[PLAYBACK_TICK] =
@@ -1316,7 +1365,7 @@ mpris2_client_class_init (Mpris2ClientClass *klass)
 		              G_SIGNAL_RUN_LAST,
 		              G_STRUCT_OFFSET (Mpris2ClientClass, loop_status),
 		              NULL, NULL,
-	                  g_cclosure_marshal_VOID__INT,
+	                  g_cclosure_marshal_VOID__ENUM,
 	                  G_TYPE_NONE, 1, G_TYPE_INT);
 
 	signals[SHUFFLE] =
@@ -1363,6 +1412,9 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->rate                  = 1.0;
 	mpris2->metadata              = NULL;
 	mpris2->volume                = -1;
+	mpris2->position              = 0;
+	mpris2->minimum_rate          = 1.0;
+	mpris2->maximum_rate          = 1.0;
 
 	mpris2->has_loop_status       = FALSE;
 	mpris2->loop_status           = FALSE;
