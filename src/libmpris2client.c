@@ -126,7 +126,7 @@ static void      mpris2_client_set_media_player_properties     (Mpris2Client *mp
 /**
  * mpris2_client_new:
  *
- * Returns: a new instance of mpris2client.
+ * Returns: (transfer full): a new instance of mpris2client.
  */
 
 Mpris2Client *
@@ -597,17 +597,18 @@ mpris2_client_set_player (Mpris2Client *mpris2, const gchar *player)
 		mpris2->player_proxy = NULL;
 	}
 
-	/* Set new player */
-	if (mpris2->player != NULL)
+	/* Clean player */
+	if (mpris2->player != NULL) {
 		g_free (mpris2->player);
+		mpris2->player = NULL;
+	}
 
-	if (player != NULL)
+	/* Set new player and connect again */
+	if (player != NULL) {
 		mpris2->player = g_strdup(player);
-	else
-		mpris2->player = g_strdup("unknown");
 
-	/* Connect again */
-	mpris2_client_connect_dbus (mpris2);
+		mpris2_client_connect_dbus (mpris2);
+	}
 }
 
 gchar *
@@ -1318,6 +1319,9 @@ mpris2_client_connect_dbus (Mpris2Client *mpris2)
 	GError     *gerror = NULL;
 	guint       watch_id;
 
+	if (mpris2->player == NULL)
+		return;
+
 	g_free(mpris2->dbus_name);
 	mpris2->dbus_name = g_strdup_printf("org.mpris.MediaPlayer2.%s", mpris2->player);
 
@@ -1512,7 +1516,7 @@ mpris2_client_init (Mpris2Client *mpris2)
 	mpris2->dbus_name             = NULL;
 	mpris2->watch_id              = 0;
 
-	mpris2->player                = g_strdup("unknown");
+	mpris2->player                = NULL;
 
 	mpris2->can_quit              = FALSE;
 	mpris2->can_set_fullscreen    = FALSE;

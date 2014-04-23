@@ -1,3 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 gtkdocize || exit 1
-autoreconf -i -v --force
+autoreconf -i -f || exit 1
+exec ./configure "$@"

@@ -20,7 +20,7 @@ DOC_SOURCE_DIR=$(top_srcdir)/src
 SCANGOBJ_OPTIONS=
 
 # Extra options to supply to gtkdoc-scan.
-SCAN_OPTIONS=
+SCAN_OPTIONS=--rebuild-types --rebuild-sections
 
 # Extra options to supply to gtkdoc-mkdb.
 MKDB_OPTIONS=--sgml-mode --output-format=xml
