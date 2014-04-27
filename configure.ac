@@ -1,9 +1,11 @@
 AC_PREREQ([2.64])
-AC_INIT([libmpris2client], [0.0.1], [mati86dl@gmail.com], [], [https://github.com/matiasdelellis])
+AC_INIT([libmpris2client], [0.1.0], [mati86dl@gmail.com], [], [https://github.com/matiasdelellis])
 AC_CONFIG_SRCDIR([src/libmpris2client.c])
 AC_CONFIG_HEADERS([config.h])
 LT_INIT
 AM_INIT_AUTOMAKE
+
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Checks for programs.
 AC_PROG_CC
@@ -19,6 +21,7 @@ AM_CONDITIONAL([ENABLE_GTK_DOC], false)
 
 # Checks for libraries.
 PKG_CHECK_MODULES(GIO, gio-2.0, HAVE_GIO=yes, AC_MSG_ERROR([Could not find gio-2.0]))
+PKG_CHECK_MODULES(GTK, gtk+-2.0, HAVE_GTK=yes, AC_MSG_ERROR([Could not find gtk+-2.0]))
 
 # Checks for header files.
 AC_CHECK_HEADERS([ctype.h stdlib.h string.h stdint.h])
@@ -34,6 +37,7 @@ AC_CONFIG_FILES([
 Makefile
 libmpris2client.pc
 src/Makefile
+status-icon/Makefile
 docs/Makefile
 docs/version.xml
 ])

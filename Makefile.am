@@ -1,5 +1,6 @@
 SUBDIRS = \
 	src   \
+	status-icon \
 	docs
 
 pkgconfigdir = $(libdir)/pkgconfig
