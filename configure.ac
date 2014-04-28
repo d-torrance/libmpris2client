@@ -3,7 +3,8 @@ AC_INIT([libmpris2client], [0.1.0], [mati86dl@gmail.com], [], [https://github.co
 AC_CONFIG_SRCDIR([src/libmpris2client.c])
 AC_CONFIG_HEADERS([config.h])
 LT_INIT
-AM_INIT_AUTOMAKE
+
+AM_INIT_AUTOMAKE([no-dist-gzip dist-bzip2])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
@@ -13,11 +14,11 @@ AM_PROG_CC_C_O
 AM_PROG_LIBTOOL
 
 # check for gtk-doc
-m4_ifdef([GTK_DOC_CHECK], [
-GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
-],[
-AM_CONDITIONAL([ENABLE_GTK_DOC], false)
-])
+#m4_ifdef([GTK_DOC_CHECK], [
+#GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+#],[
+#AM_CONDITIONAL([ENABLE_GTK_DOC], false)
+#])
 
 # Checks for libraries.
 PKG_CHECK_MODULES(GIO, gio-2.0, HAVE_GIO=yes, AC_MSG_ERROR([Could not find gio-2.0]))
@@ -38,8 +39,6 @@ Makefile
 libmpris2client.pc
 src/Makefile
 status-icon/Makefile
-docs/Makefile
-docs/version.xml
 ])
 AC_OUTPUT
 

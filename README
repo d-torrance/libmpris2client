@@ -3,7 +3,3 @@ Libmpris2client: It is a generic library for controlling any mpris2 compatible p
 Implemented:
  * Interface org.mpris.MediaPlayer2
  * Interface org.mpris.MediaPlayer2.Player
-   TODO:
-    - Seek
-    - SetPosition
-    - Some Can* properties.
