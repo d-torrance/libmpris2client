@@ -124,6 +124,9 @@ mpris2_status_icon_open_files (GtkStatusIcon *widget,
 	gchar **mime_types = NULL;
 	guint i = 0;
 
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	dialog = gtk_file_chooser_dialog_new ("Open File",
 	                                      NULL,
 	                                      GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -151,6 +154,9 @@ static void
 mpris2_status_icon_prev (GtkStatusIcon *widget,
                          Mpris2Client *mpris2)
 {
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	mpris2_client_prev (mpris2);
 }
 
@@ -158,6 +164,9 @@ static void
 mpris2_status_icon_play_pause (GtkStatusIcon *widget,
                                Mpris2Client *mpris2)
 {
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	mpris2_client_play_pause (mpris2);
 }
 
@@ -165,6 +174,9 @@ static void
 mpris2_status_icon_stop (GtkStatusIcon *widget,
                          Mpris2Client *mpris2)
 {
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	mpris2_client_stop (mpris2);
 }
 
@@ -172,6 +184,9 @@ static void
 mpris2_status_icon_next (GtkStatusIcon *widget,
                          Mpris2Client *mpris2)
 {
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	mpris2_client_next (mpris2);
 }
 
@@ -179,6 +194,9 @@ static void
 mpris2_status_icon_quit_player (GtkStatusIcon *widget,
                                 Mpris2Client *mpris2)
 {
+	if (!mpris2_client_is_connected(mpris2))
+		return;
+
 	mpris2_client_quit_player (mpris2);
 }
 
@@ -250,6 +268,7 @@ mpris2_status_icon_playback_status (Mpris2Client *mpris2, PlaybackStatus playbac
 		case STOPPED:
 		default:
 			g_emblemed_icon_add_emblem (G_EMBLEMED_ICON(player_icon), stopped_emblem);
+
 			gtk_status_icon_set_tooltip (status_icon, _("Mpris2"));
 
 			gtk_label_set_text (GTK_LABEL(track_label), _("Mpris2"));
@@ -257,6 +276,8 @@ mpris2_status_icon_playback_status (Mpris2Client *mpris2, PlaybackStatus playbac
 			gtk_label_set_text (GTK_LABEL(time_label), "00:00");
 			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0.0);
 			gtk_label_set_text (GTK_LABEL(length_label), "--:--");
+
+			mpris2_album_art_set_path (album_art, NULL);
 			break;
 	}
 
@@ -281,7 +302,6 @@ mpris2_status_icon_playback_tick (Mpris2Client *mpris2, gint position, GtkStatus
 		fraction = (gdouble) position/1000000/(gdouble)length;
 		gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), fraction);
 	}
-
 
 	g_free(s_time);
 }
@@ -323,6 +343,8 @@ mpris2_status_icon_connecion (Mpris2Client *mpris2, gboolean connected, GtkStatu
 		gtk_label_set_text (GTK_LABEL(time_label), "00:00");
 		gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0.0);
 		gtk_label_set_text (GTK_LABEL(length_label), "--:--");
+
+		mpris2_album_art_set_path (album_art, NULL);
 	}
 }
 
