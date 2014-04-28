@@ -325,7 +325,7 @@ mpris2_status_icon_playback_tick (Mpris2Client *mpris2, gint position, GtkStatus
 }
 
 static void
-mpris2_status_icon_connecion (Mpris2Client *mpris2, gboolean connected, GtkStatusIcon *icon)
+mpris2_status_icon_connection (Mpris2Client *mpris2, gboolean connected, GtkStatusIcon *icon)
 {
 	GDesktopAppInfo *player_info = NULL;
 	const gchar *desktop_entry   = NULL;
@@ -354,7 +354,7 @@ mpris2_status_icon_connecion (Mpris2Client *mpris2, gboolean connected, GtkStatu
 	}
 	else {
 		gtk_status_icon_set_tooltip (status_icon, _("Mpris2"));
-		gtk_status_icon_set_from_icon_name (icon, "xfce4-mpris2-plugin");
+		gtk_status_icon_set_from_icon_name (icon, "mpris2-status-icon");
 
 		gtk_label_set_text (GTK_LABEL(track_label), _("Mpris2"));
 
@@ -668,7 +668,7 @@ main (gint argc,
 	                  G_CALLBACK (mpris2_status_icon_scroll), mpris2);
 
 	g_signal_connect (G_OBJECT (mpris2), "connection",
-	                  G_CALLBACK(mpris2_status_icon_connecion), status_icon);
+	                  G_CALLBACK(mpris2_status_icon_connection), status_icon);
 	g_signal_connect (G_OBJECT (mpris2), "playback-status",
 	                  G_CALLBACK(mpris2_status_icon_playback_status), status_icon);
 	g_signal_connect (G_OBJECT (mpris2), "playback-tick",
