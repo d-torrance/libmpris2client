@@ -151,6 +151,24 @@ mpris2_status_icon_open_files (GtkStatusIcon *widget,
 }
 
 static void
+mpris2_status_icon_toggled_shuffle_action (GtkWidget    *widget,
+                                           Mpris2Client *mpris2)
+{
+	mpris2_client_set_shuffle (mpris2,
+		gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)));
+}
+
+static void
+mpris2_status_icon_toggled_loop_action (GtkWidget    *widget,
+                                        Mpris2Client *mpris2)
+{
+	if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+		mpris2_client_set_loop_status (mpris2, PLAYLIST);
+	else
+		mpris2_client_set_loop_status (mpris2, NONE);
+}
+
+static void
 mpris2_status_icon_prev (GtkStatusIcon *widget,
                          Mpris2Client *mpris2)
 {
@@ -396,6 +414,30 @@ mpris2_status_icon_show_mpris2_popup (GtkWidget    *widget,
 		gtk_menu_append (mpris2_popup_menu, item);
 		g_signal_connect (G_OBJECT(item), "activate",
 		                  G_CALLBACK(mpris2_status_icon_open_files), mpris2);
+
+		item = gtk_separator_menu_item_new ();
+		gtk_menu_append (mpris2_popup_menu, item);
+
+		if (mpris2_client_player_has_shuffle (mpris2)) {
+			item = gtk_check_menu_item_new_with_mnemonic (_("Shuffle"));
+			gtk_menu_append (mpris2_popup_menu, item);
+			if (mpris2_client_get_shuffle(mpris2))
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+			g_signal_connect (G_OBJECT(item), "activate",
+				             G_CALLBACK(mpris2_status_icon_toggled_shuffle_action), mpris2);
+		}
+
+		if (mpris2_client_player_has_loop_status (mpris2)) {
+			item = gtk_check_menu_item_new_with_mnemonic (_("Loop playlist"));
+			gtk_menu_append (mpris2_popup_menu, item);
+			if (PLAYLIST == mpris2_client_get_loop_status(mpris2))
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+			g_signal_connect (G_OBJECT(item), "activate",
+				             G_CALLBACK(mpris2_status_icon_toggled_loop_action), mpris2);
+		}
+
+		item = gtk_separator_menu_item_new ();
+		gtk_menu_append (mpris2_popup_menu, item);
 
 		item = gtk_menu_item_new_with_label ("Close");
 		gtk_menu_append (mpris2_popup_menu, item);
