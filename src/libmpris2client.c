@@ -1088,17 +1088,17 @@ mpris2_client_parse_player_properties (Mpris2Client *mpris2, GVariant *propertie
 		}
 	}
 
-	if (playback_status != NULL) {
-		mpris2_client_parse_playback_status (mpris2, playback_status);
-		g_signal_emit (mpris2, signals[PLAYBACK_STATUS], 0, mpris2->playback_status);
-	}
-
 	if (metadata != NULL) {
 		if (mpris2->metadata != NULL)
 			mpris2_metadata_free (mpris2->metadata);
 		mpris2->metadata = metadata;
 
 		g_signal_emit (mpris2, signals[METADATA], 0, metadata);
+	}
+
+	if (playback_status != NULL) {
+		mpris2_client_parse_playback_status (mpris2, playback_status);
+		g_signal_emit (mpris2, signals[PLAYBACK_STATUS], 0, mpris2->playback_status);
 	}
 
 	if (volume != -1) {
