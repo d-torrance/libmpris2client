@@ -113,7 +113,6 @@ G_DEFINE_TYPE (Mpris2Client, mpris2_client, G_TYPE_OBJECT)
 static void      mpris2_client_call_player_method              (Mpris2Client *mpris2, const char *method);
 static void      mpris2_client_call_media_player_method        (Mpris2Client *mpris2, const char *method);
 
-static gchar    *mpris2_client_check_player                    (Mpris2Client *mpris2);
 static void      mpris2_client_connect_dbus                    (Mpris2Client *mpris2);
 
 static GVariant *mpris2_client_get_all_player_properties       (Mpris2Client *mpris2);
@@ -614,9 +613,14 @@ mpris2_client_set_player (Mpris2Client *mpris2, const gchar *player)
 gchar *
 mpris2_client_auto_set_player (Mpris2Client *mpris2)
 {
-	gchar *player = mpris2_client_check_player (mpris2);
+	gchar *player = NULL;
+	gchar **players = mpris2_client_get_available_players (mpris2);
 
-	mpris2_client_set_player (mpris2, player);
+	if (players != NULL) {
+		mpris2_client_set_player (mpris2, players[0]);
+		player = g_strdup(players[0]);
+		g_strfreev (players);
+	}
 
 	return player;
 }
@@ -714,14 +718,15 @@ mpris2_client_call_media_player_method (Mpris2Client *mpris2, const char *method
 
 /* Returns the first player name that compliant to mpris2 on dbus.  */
 
-static gchar *
-mpris2_client_check_player (Mpris2Client *mpris2)
+gchar **
+mpris2_client_get_available_players (Mpris2Client *mpris2)
 {
 	GError *error = NULL;
 	GVariant *v;
 	GVariantIter *iter;
 	const gchar *str = NULL;
-	gchar *player = NULL;
+	gchar **res = NULL;
+	guint items = 0;
 
 	v = g_dbus_connection_call_sync (mpris2->gconnection,
 	                                 "org.freedesktop.DBus",
@@ -744,14 +749,22 @@ mpris2_client_check_player (Mpris2Client *mpris2)
 	g_variant_get (v, "(as)", &iter);
 	while (g_variant_iter_loop (iter, "&s", &str)) {
 		if (g_str_has_prefix(str, "org.mpris.MediaPlayer2.")) {
-			player = g_strdup(str + 23);
-			break;
+			res = (gchar**)g_realloc(res, (items + 1) * sizeof(gchar*));
+			res[items] = g_strdup(str + 23);
+			items++;
 		}
 	}
+
+	/* Add NULL termination to the res vector */
+	if (items > 0) {
+		res = g_realloc(res, (items + 1) * sizeof(gchar*));
+		res[items] = NULL;
+	}
+
 	g_variant_iter_free (iter);
 	g_variant_unref (v);
 
-	return player;
+	return res;
 }
 
 /* Get all properties using org.freedesktop.DBus.Properties interface.  */
