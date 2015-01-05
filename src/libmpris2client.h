@@ -83,7 +83,7 @@ Mpris2Client   *mpris2_client_new (void);
 
 const gchar    *mpris2_client_get_player                (Mpris2Client *mpris2);
 void            mpris2_client_set_player                (Mpris2Client *mpris2, const gchar *player);
-gchar          *mpris2_client_auto_set_player           (Mpris2Client *mpris2);
+gboolean        mpris2_client_auto_connect              (Mpris2Client *mpris2);
 
 gchar         **mpris2_client_get_available_players     (Mpris2Client *mpris2);
 

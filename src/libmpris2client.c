@@ -610,19 +610,19 @@ mpris2_client_set_player (Mpris2Client *mpris2, const gchar *player)
 	}
 }
 
-gchar *
-mpris2_client_auto_set_player (Mpris2Client *mpris2)
+gboolean
+mpris2_client_auto_connect (Mpris2Client *mpris2)
 {
-	gchar *player = NULL;
+	gboolean ret = FALSE;
 	gchar **players = mpris2_client_get_available_players (mpris2);
 
 	if (players != NULL) {
 		mpris2_client_set_player (mpris2, players[0]);
-		player = g_strdup(players[0]);
 		g_strfreev (players);
+		ret = TRUE;
 	}
 
-	return player;
+	return ret;
 }
 
 gboolean

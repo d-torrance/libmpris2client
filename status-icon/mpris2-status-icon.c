@@ -481,7 +481,7 @@ mpris2_status_icon_activate (GtkStatusIcon *icon,
 	{
 		case 1:
 			if (!mpris2_client_is_connected(mpris2))
-				mpris2_client_auto_set_player (mpris2);
+				mpris2_client_auto_connect (mpris2);
 			else
 				gtk_widget_show (popup_dialog);
 			break;

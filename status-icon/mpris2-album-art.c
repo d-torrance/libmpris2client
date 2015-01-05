@@ -253,8 +253,8 @@ mpris2_album_art_class_init (Mpris2AlbumArtClass *klass)
 		g_param_spec_string("path",
 		                    "Path",
 		                    "The album art path",
-		                    BASEICONDIR"/128x128/apps/mpris2-status-icon.png",
-		                    G_PARAM_READWRITE |G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS);
+		                    NULL,
+		                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
 	/**
 	 * Mpris2AlbumArt:size:
@@ -266,7 +266,7 @@ mpris2_album_art_class_init (Mpris2AlbumArtClass *klass)
 		                  "The album art size",
 		                  24, 512,
 		                  48,
-		                  G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS);
+		                  G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
 	g_object_class_install_properties(object_class, LAST_PROP, gParamSpecs);
 }
