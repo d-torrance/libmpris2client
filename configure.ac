@@ -21,8 +21,8 @@ AM_PROG_LIBTOOL
 #])
 
 # Checks for libraries.
-PKG_CHECK_MODULES(GIO, gio-2.0, HAVE_GIO=yes, AC_MSG_ERROR([Could not find gio-2.0]))
-PKG_CHECK_MODULES(GTK, gtk+-2.0, HAVE_GTK=yes, AC_MSG_ERROR([Could not find gtk+-2.0]))
+PKG_CHECK_MODULES(GIO, gio-2.0 >= 2.30, HAVE_GIO=yes, AC_MSG_ERROR([Could not find gio-2.0]))
+PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 3.2, HAVE_GTK=yes, AC_MSG_ERROR([Could not find gtk+-3.0]))
 
 # Checks for header files.
 AC_CHECK_HEADERS([ctype.h stdlib.h string.h stdint.h])
