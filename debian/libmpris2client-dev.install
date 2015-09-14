@@ -1,0 +1,4 @@
+usr/include
+usr/lib/*/libmpris2client.a
+usr/lib/*/libmpris2client.so
+usr/lib/*/pkgconfig/libmpris2client.pc

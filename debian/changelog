@@ -1,0 +1,6 @@
+libmpris2client (0.1.0+git20150105-1) unstable; urgency=low
+
+  * Initial release (Closes: #798912).
+
+ -- Doug Torrance <dtorrance@piedmont.edu>  Sun, 13 Sep 2015 21:58:19 -0400
+

@@ -1,0 +1,98 @@
+Source: libmpris2client
+Section: libs
+Priority: optional
+Maintainer: Doug Torrance <dtorrance@piedmont.edu>
+Build-Depends: debhelper (>= 9),
+               dh-autoreconf,
+               libglib2.0-dev,
+               libgtk-3-dev,
+               pkg-config
+Standards-Version: 3.9.6
+Homepage: https://github.com/matiasdelellis/libmpris2client
+Vcs-Browser: https://github.com/d-torrance/libmpris2client
+Vcs-Git: https://github.com/d-torrance/libmpris2client
+
+Package: libmpris2client0
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Multi-Arch: same
+Description: Library to control mpris2 compatible players (shared library)
+ Libmpris2client is a generic library for controlling any mpris2 compatible
+ player.
+ .
+ The Media Player Remote Interfacing Specification is a standard
+ D-Bus interface which aims to provide a common programmatic API for
+ controlling media players.
+ .
+ It provides a mechanism for discovery, querying and basic playback
+ control of compliant media players, as well as a tracklist interface
+ which is used to add context to the active media item.
+ .
+ See http://specifications.freedesktop.org/mpris-spec/2.2/.
+ .
+ This package contains the shared library. Install this for programs that
+ use libmpris2client.
+
+Package: libmpris2client-dev
+Architecture: any
+Section: libdevel
+Depends: libmpris2client0 (= ${binary:Version}), ${misc:Depends}
+Multi-Arch: same
+Description: Library to control mpris2 compatible players (development files)
+ Libmpris2client is a generic library for controlling any mpris2 compatible
+ player.
+ .
+ The Media Player Remote Interfacing Specification is a standard
+ D-Bus interface which aims to provide a common programmatic API for
+ controlling media players.
+ .
+ It provides a mechanism for discovery, querying and basic playback
+ control of compliant media players, as well as a tracklist interface
+ which is used to add context to the active media item.
+ .
+ See http://specifications.freedesktop.org/mpris-spec/2.2/.
+ .
+ This package contains the static library and the required headers. Use it
+ to compile programs which use libmpris2client.
+
+Package: libmpris2client-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: libmpris2client0 (= ${binary:Version}), ${misc:Depends}
+Multi-Arch: same
+Description: Library to control mpris2 compatible players (debugging symbols)
+ Libmpris2client is a generic library for controlling any mpris2 compatible
+ player.
+ .
+ The Media Player Remote Interfacing Specification is a standard
+ D-Bus interface which aims to provide a common programmatic API for
+ controlling media players.
+ .
+ It provides a mechanism for discovery, querying and basic playback
+ control of compliant media players, as well as a tracklist interface
+ which is used to add context to the active media item.
+ .
+ See http://specifications.freedesktop.org/mpris-spec/2.2/.
+ .
+ This package contains the debugging symbols.
+
+Package: mpris2-status-icon
+Architecture: any
+Section: sound
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Multi-Arch: foreign
+Description: Status icon to control mpris2 compatible players
+ Control any mpris2 compatible player from the notification area.  This
+ application also serves as an example for the libmpris2client library.
+ .
+ The Media Player Remote Interfacing Specification is a standard
+ D-Bus interface which aims to provide a common programmatic API for
+ controlling media players.
+ .
+ It provides a mechanism for discovery, querying and basic playback
+ control of compliant media players, as well as a tracklist interface
+ which is used to add context to the active media item.
+ .
+ See http://specifications.freedesktop.org/mpris-spec/2.2/.

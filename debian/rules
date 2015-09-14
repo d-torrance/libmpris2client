@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+export V=1
+
+%:
+	dh $@ --with autoreconf
+
+override_dh_strip:
+	dh_strip --dbg-package=libmpris2client-dbg
+
+get-orig-source:
+	wget https://github.com/matiasdelellis/libmpris2client/archive/master.tar.gz
+	git checkout upstream
+	git pull https://github.com/matiasdelellis/libmpris2client
+	grep -Po '(?<=AC_INIT\(\[libmpris2client\], \[).*(?=\], \[m)' configure.ac \
+		> version
+	git show HEAD^:configure.ac | \
+		grep -Po '(?<=AC_INIT\(\[libmpris2client\], \[).*(?=\], \[m)' > oldversion
+	if test `cat oldversion` = `cat version` ; then \
+		echo "`cat version`+git`date -d @\`git log -1 --pretty=format:%ct\` +%Y%m%d`" > version; \
+	fi
+	git checkout master
+	mv -v master.tar.gz ../libmpris2client_`cat version`.orig.tar.gz
+	rm version oldversion
